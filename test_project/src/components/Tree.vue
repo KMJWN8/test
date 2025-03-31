@@ -1,5 +1,6 @@
 <template>
     <el-tree
+    class="shadow-2"
       :data="treeData"
       node-key="id"
       :default-expanded-keys="expandedKeys"

@@ -1,5 +1,5 @@
-<template>
-  <div class="app-container">
+<!-- <template>
+  <div class="common-layout">
     <div class="tree-container">
       <Tree :tree-data="treeData" @node-selected="onNodeSelected" />
     </div>
@@ -7,13 +7,41 @@
       <EmployeeList :employees="selectedEmployees" />
     </div>
   </div>
+</template> -->
+
+
+<template>
+  <div class="common-layout">
+    <el-container class="h-screen flex flex-col">
+      <el-header class="bg-[#181818] shadow-md">
+        <div class="my-3 mx-8 text-2xl font-bold text-amber-50">
+            ГИС учета сотрудников
+        </div>
+      </el-header>
+      <el-container class="flex-1">
+        <el-aside class="h-full w-[200px] shadow-md">
+          <Tree :tree-data="treeData" @node-selected="onNodeSelected" />
+        </el-aside>
+        <el-main>
+          <Statistics />
+          <EmployeeList :employees="selectedEmployees" />
+        </el-main>
+      </el-container>
+    </el-container>
+  </div>
 </template>
+
+
+
+
+
 
 <script setup>
 import { ref } from 'vue';
 import axios from 'axios';
 import Tree from './components/Tree.vue';
 import EmployeeList from './components/EmployeeList.vue';
+import Statistics from './components/Statistics.vue';
 
 // Инициализация данных
 const treeData = ref([]);
