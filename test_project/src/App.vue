@@ -1,15 +1,3 @@
-<!-- <template>
-  <div class="common-layout">
-    <div class="tree-container">
-      <Tree :tree-data="treeData" @node-selected="onNodeSelected" />
-    </div>
-    <div class="employee-container">
-      <EmployeeList :employees="selectedEmployees" />
-    </div>
-  </div>
-</template> -->
-
-
 <template>
   <div class="common-layout">
     <el-container class="h-screen flex flex-col">
@@ -30,11 +18,6 @@
     </el-container>
   </div>
 </template>
-
-
-
-
-
 
 <script setup>
 import { ref } from 'vue';
@@ -82,6 +65,7 @@ const fetchData = async () => {
   }
 };
 
+
 const onNodeSelected = (node) => {
   selectedEmployees.value = collectEmployees(node);
 };
@@ -122,15 +106,5 @@ fetchData();
 </script>
 
 <style>
-.app-container {
-  display: flex;
-  gap: 20px;
-  padding: 20px;
-}
-.tree-container {
-  width: 30%;
-}
-.employee-container {
-  width: 70%;
-}
+
 </style>
