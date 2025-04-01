@@ -35,19 +35,15 @@ const transformData = (apiData) => {
   return apiData.map((service) => ({
     id: service.id,
     label: service.name,
-    leader: service.leader,
     children: service.departments.map((department) => ({
       id: department.id,
       label: department.name,
-      leader: department.leader,
       children: department.divisions.map((division) => ({
         id: division.id,
         label: division.name,
-        leader: division.leader,
         children: division.teams.map((team) => ({
           id: team.id,
           label: team.name,
-          leader: team.leader,
           members: team.members, // Список сотрудников группы
         })),
       })),
