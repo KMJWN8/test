@@ -136,9 +136,7 @@ fetchData();
 </script>
 
 <style>
-.el-aside {
-  width: 390px;
-  z-index: 1000;
+.el-aside{
+  width: fit-content !important;
 }
-
 </style>
