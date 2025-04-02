@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-4 p-4 bg-white border rounded-lg shadow-md">
+  <div class="flex gap-4 p-4 bg-white border border-slate-100 rounded-lg shadow-md cursor-pointer hover:-translate-y-2 hover:shadow-xl transition">
     <div class="flex-shrink-0 w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
   <img
     v-if="employee.photo"

@@ -42,12 +42,14 @@ const handleNodeExpand = (node) => {
 </script>
 
 <style>
-.el-tree-node__content span {
+/* .el-tree-node__content {
   width: 100%;
+  white-space: normal;
   word-break: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
   margin-top: auto;
-  margin-bottom: auto;
-}
+  margin-bottom: 6px;
+} */
+
 </style>

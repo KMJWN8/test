@@ -7,7 +7,7 @@
         </div>
       </el-header>
       <el-container class="flex-1">
-        <el-aside class="h-full w-[200px] shadow-md">
+        <el-aside class="h-full shadow-md">
           <Tree :tree-data="treeData" @node-selected="onNodeSelected" />
         </el-aside>
         <el-main>
@@ -136,5 +136,9 @@ fetchData();
 </script>
 
 <style>
+.el-aside {
+  width: 390px;
+  z-index: 1000;
+}
 
 </style>
