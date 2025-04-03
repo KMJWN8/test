@@ -8,7 +8,7 @@
       </el-header>
       <el-container class="flex-1">
         <el-aside class="h-full shadow-md">
-          <Tree :tree-data="treeData" @node-selected="onNodeSelected" />
+          <Tree :tree-data="treeData" @node-selected="onNodeSelected" @refresh-tree="fetchData"/>
         </el-aside>
         <el-main>
           <Statistics :statistics="currentStatistics" />
@@ -56,15 +56,23 @@ const transformData = (apiData) => {
 };
 
 // Получение данных с API через Axios
-const fetchData = async () => {
+// const fetchData = async () => {
+//   try {
+//     const response = await axios.get('http://127.0.0.1:8000/api/services/'); // Замените на реальный URL API
+//     treeData.value = transformData(response.data);
+//   } catch (error) {
+//     console.error('Ошибка при получении данных:', error);
+//   }
+// };
+const fetchData = async (expandedKeys = []) => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api/services/'); // Замените на реальный URL API
+    const response = await axios.get('http://127.0.0.1:8000/api/services/');
     treeData.value = transformData(response.data);
+    expandedKeys.forEach(key => expandedKeys.value.push(key));
   } catch (error) {
     console.error('Ошибка при получении данных:', error);
   }
 };
-
 
 const onNodeSelected = async (node) => {
   selectedEmployees.value = collectEmployees(node);
