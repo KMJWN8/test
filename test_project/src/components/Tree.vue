@@ -1,52 +1,7 @@
-<!-- <template>
-  <el-tree
-  class="shadow-2 p-4"
-    :data="treeData"
-    node-key="id"
-    :default-expanded-keys="expandedKeys"
-    @node-click="handleNodeClick"
-    @node-expand="handleNodeExpand"
-  />
-</template>
-
-<script setup>
-import { ref } from 'vue';
-
-// Props для получения данных дерева
-defineProps({
-  treeData: {
-    type: Array,
-    required: true,
-  },
-});
-
-// Состояние для хранения развернутых узлов
-const expandedKeys = ref([]);
-
-// Эмит события при клике на узел
-const emit = defineEmits(['node-selected']);
-
-// Обработка клика по узлу
-const handleNodeClick = (node) => {
-  emit('node-selected', node);
-};
-
-// Обработка разворачивания узла
-const handleNodeExpand = (node) => {
-  // Очищаем все развернутые узлы
-  expandedKeys.value = [];
-
-  // Добавляем только текущий узел в список развернутых
-  expandedKeys.value.push(node.id);
-};
-</script>
-
-<style></style> -->
-
 <template>
   <div class="relative">
     <el-tree
-      class="shadow-2 p-4"
+      class="shadow-2 p-4 text-sm"
       :data="treeData"
       node-key="id"
       :default-expanded-keys="expandedKeys"
@@ -97,25 +52,26 @@ const addChild = async () => {
   if (!selectedNode.value) return;
 
   let parentKey = ''
+  let childKey = ''
   
   switch(selectedNode.value.type){
     case 'service':
       parentKey = 'service'
+      childKey = 'department'
       break
     case 'department':
-      parentKey = 'service'
+      parentKey = 'department'
+      childKey = 'division'
       break
     case 'division':
-      parentKey = 'department'
-      break
-    case 'team':
       parentKey = 'division'
+      childKey = 'team'
       break
     default:
       console.log("Неизвестный тип узла")
       return
   }
-  const url = `http://127.0.0.1:8000/api/${parentKey}s/`;
+  const url = `http://127.0.0.1:8000/api/${childKey}s/`;
   await axios.post(url, { name: 'Новый узел', [parentKey]: selectedNode.value.id });
   emit('refresh-tree', expandedKeys.value);
   contextMenu.value.visible = false;
@@ -182,4 +138,8 @@ onMounted(() => {
 .context-item:hover{
 background: #f4f4f4;
 }
+
+/* .el-tree-node__label {
+    @apply text-sm;
+} */
 </style>
