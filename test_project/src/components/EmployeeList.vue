@@ -1,6 +1,6 @@
 <template>
     <div>
-      <h3 v-if="employees.length" class="text-xl font-bold mb-4">Список сотрудников</h3>
+      <h3 v-if="employees.length" class="text-xl font-bold mb-4 text-gray-800">Список сотрудников</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Карточки сотрудников -->
         <EmployeeCard

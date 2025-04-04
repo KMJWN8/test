@@ -1,18 +1,21 @@
 <template>
   <div class="common-layout">
     <el-container class="h-screen flex flex-col">
-      <el-header class="bg-[#181818] shadow-md">
+      <el-header class="bg-[#161F6D] shadow-md flex flex-row">
+        <img src="@/assets/icons/icon.png" class="w-10 h-10 ml-8 my-2" />
         <div class="my-3 mx-8 text-2xl font-bold text-amber-50">
             ГИС учета сотрудников
         </div>
       </el-header>
       <el-container class="flex-1">
-        <el-aside class="h-full shadow-md">
+        <el-aside class="h-screen shadow-md scrollable-content">
           <Tree :tree-data="treeData" @node-selected="onNodeSelected" @refresh-tree="fetchData"/>
         </el-aside>
         <el-main>
           <Statistics :statistics="currentStatistics" />
-          <EmployeeList :employees="selectedEmployees" />
+          <div class="scrollable-content">
+            <EmployeeList :employees="selectedEmployees" />
+          </div>
         </el-main>
       </el-container>
     </el-container>
@@ -146,5 +149,10 @@ fetchData();
 <style>
 .el-aside{
   width: fit-content !important;
+  transition: width 0.3s ease-in-out !important;
+}
+.scrollable-content {
+  overflow-y: auto; /* Добавляем прокрутку по вертикали */
+  height: calc(100vh - 60px - 16px); /* Высота контейнера */
 }
 </style>
