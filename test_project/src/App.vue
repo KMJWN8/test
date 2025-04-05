@@ -1,6 +1,6 @@
 <template>
   <div class="common-layout">
-    <el-container class="h-screen flex flex-col">
+    <el-container class="flex flex-col">
       <el-header class="bg-[#161F6D] shadow-md flex flex-row">
         <img src="@/assets/icons/icon.png" class="w-10 h-10 ml-8 my-2" />
         <div class="my-3 mx-8 text-2xl font-bold text-amber-50">
@@ -8,7 +8,7 @@
         </div>
       </el-header>
       <el-container class="flex-1">
-        <el-aside class="h-screen shadow-md scrollable-content">
+        <el-aside class="shadow-md">
           <Tree :tree-data="treeData" @node-selected="onNodeSelected" @refresh-tree="fetchData"/>
         </el-aside>
         <el-main>
@@ -58,15 +58,6 @@ const transformData = (apiData) => {
   }));
 };
 
-// Получение данных с API через Axios
-// const fetchData = async () => {
-//   try {
-//     const response = await axios.get('http://127.0.0.1:8000/api/services/'); // Замените на реальный URL API
-//     treeData.value = transformData(response.data);
-//   } catch (error) {
-//     console.error('Ошибка при получении данных:', error);
-//   }
-// };
 const fetchData = async (expandedKeys = []) => {
   try {
     const response = await axios.get('http://127.0.0.1:8000/api/services/');
@@ -150,9 +141,17 @@ fetchData();
 .el-aside{
   width: fit-content !important;
   transition: width 0.3s ease-in-out !important;
+  
 }
 .scrollable-content {
   overflow-y: auto; /* Добавляем прокрутку по вертикали */
-  height: calc(100vh - 60px - 16px); /* Высота контейнера */
+  height: 100vh;
+  overscroll-behavior: contain;
+}
+.el-main{
+  padding-top: 5px !important;
+}
+.el-container{
+  overflow: hidden;
 }
 </style>

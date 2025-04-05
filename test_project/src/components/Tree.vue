@@ -4,7 +4,7 @@
       Список подразделений
     </div>
     <el-tree
-      class="shadow-2 p-4"
+      class="pl-3 pr-3"
       :data="treeData"
       node-key="id"
       :default-expanded-keys="expandedKeys"
@@ -14,14 +14,26 @@
     />
 
     <!-- Контекстное меню -->
+<div 
+  v-if="contextMenu.visible" 
+  class="fixed bg-white border border-gray-300 rounded-lg shadow-lg py-2 w-70 z-50"
+  :style="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }">
     <div 
-      v-if="contextMenu.visible" 
-      class="context-menu"
-      :style="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }">
-        <div class="context-item" @click="openForm('add')">Добавить дочерний узел</div>
-        <div class="context-item" @click="openForm('edit')">Редактировать узел</div>
-        <div class="context-item" @click="deleteNode">Удалить узел</div>
+      class="px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition"
+      @click="openForm('add')">
+      ➕ Добавить дочерний узел
     </div>
+    <div 
+      class="px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition"
+      @click="openForm('edit')">
+      ✏️ Редактировать узел
+    </div>
+    <div 
+      class="px-4 py-2 text-red-600 hover:bg-red-100 hover:text-red-800 cursor-pointer transition"
+      @click="deleteNode">
+      🗑️ Удалить узел
+    </div>
+</div>
 
     <!-- Модальное окно с формой -->
     <el-dialog
@@ -60,27 +72,28 @@ const contextMenu = ref({ visible: false, x: 0, y: 0 })
 const formDialogVisible = ref(false)
 const formTitle = ref('')
 const formMode = ref('') // 'add' или 'edit'
-const form = ref({
-name: '',
-})
+const form = ref({name: '',})
 
 const handleNodeClick = (node) => {
-emit('node-selected', node)
+  emit('node-selected', node)
 }
 
 const handleNodeExpand = (node) => {
-expandedKeys.value.push(node.id)
+  expandedKeys.value.push(node.id)
 }
 
 const handleRightClick = (event, node) => {
-selectedNode.value = node
-contextMenu.value = { visible: true, x: event.clientX, y: event.clientY }
+  let choice = true
+  selectedNode.value = node
+  if (selectedNode.value.type === 'team'){
+    choice = false
+  }
+  contextMenu.value = { visible: choice, x: event.clientX, y: event.clientY }
 }
 
 const openForm = (mode) => {
   formMode.value = mode;
-  formTitle.value =
-  mode === 'add' ? 'Добавить дочерний узел' : 'Редактировать узел'
+  formTitle.value = mode === 'add' ? 'Добавить дочерний узел' : 'Редактировать узел'
   form.value.name = mode === 'edit' ? selectedNode.value.label : ''
   formDialogVisible.value = true
   contextMenu.value.visible = false
@@ -139,25 +152,6 @@ const url = `http://127.0.0.1:8000/api/${childKey}s/`
 
 </script>
   <style>
-.context-menu {
-    position: fixed;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0px 4px 6px rgb(0,0,0,0.1);
-    padding: 2px;
-    min-width: 200px;
-    }
-    
-    .context-item {
-    padding: 8px 16px;
-    cursor: pointer;
-    }
-    
-    .context-item:hover {
-    background-color: #f4f4f4;
-    }
-
     .el-tree-node__content{
       color: black !important;
     }
@@ -168,6 +162,9 @@ const url = `http://127.0.0.1:8000/api/${childKey}s/`
 
     .el-tree {
     --el-tree-node-hover-bg-color: #00ABE1 !important;
+    }
 
+    .el-button--primary {
+    --el-button-bg-color: #161F6D !important; 
     }
   </style>

@@ -10,7 +10,7 @@
         />
       </div>
       <div v-if="!employees.length" class="text-center text-gray-500">
-        <p>Нет сотрудников в этом подразделении.</p>
+        <p class="mt-5">Нет сотрудников в этом подразделении.</p>
       </div>
     </div>
   </template>
