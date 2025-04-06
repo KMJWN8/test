@@ -14,7 +14,10 @@
         <el-main>
           <Statistics :statistics="currentStatistics" />
           <div class="scrollable-content">
-            <EmployeeList :employees="selectedEmployees" />
+            <EmployeeList 
+            :employees="selectedEmployees"
+            :selected-node="selectedNode"
+            @refresh-employees="onNodeSelected(selectedNode)" />
           </div>
         </el-main>
       </el-container>
@@ -68,7 +71,10 @@ const fetchData = async (expandedKeys = []) => {
   }
 };
 
+const selectedNode = ref(null);
+
 const onNodeSelected = async (node) => {
+  selectedNode.value = node; // Сохраняем выбранный узел
   selectedEmployees.value = collectEmployees(node);
 
   try {
