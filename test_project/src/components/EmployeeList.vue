@@ -17,6 +17,8 @@
         v-for="employee in localEmployees"
         :key="employee.id"
         :employee="employee"
+        @delete-employee="handleDeleteEmployee"
+        @edit-employee="handleEditEmployee"
       />
     </div>
 
@@ -92,6 +94,60 @@
       </div>
     </div>
   </div>
+  <div v-if="isEditModalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+  <div class="bg-white p-6 rounded-lg shadow-lg w-[400px]">
+    <h2 class="text-xl font-bold mb-4">Редактировать сотрудника</h2>
+    <form @submit.prevent="saveEditedEmployee">
+      <div class="mb-4">
+        <label class="block text-gray-700">ФИО</label>
+        <input
+          v-model="editedEmployee.full_name"
+          type="text"
+          class="w-full border border-gray-300 rounded px-3 py-2"
+          required
+        />
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700">Должность</label>
+        <input
+          v-model="editedEmployee.position"
+          type="text"
+          class="w-full border border-gray-300 rounded px-3 py-2"
+          required
+        />
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700">Дата рождения</label>
+        <input
+          v-model="editedEmployee.date_of_birth"
+          type="date"
+          class="w-full border border-gray-300 rounded px-3 py-2"
+          required
+        />
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700">Дата начала работы</label>
+        <input
+          v-model="editedEmployee.start_date"
+          type="date"
+          class="w-full border border-gray-300 rounded px-3 py-2"
+          required
+        />
+      </div>
+      <div class="flex justify-end">
+        <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+          Сохранить
+        </button>
+        <button
+          @click="closeEditModal"
+          class="ml-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Отмена
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 </template>
 
 <script setup>
@@ -109,6 +165,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+const emit = defineEmits(['refresh-employees', 'delete-employee']);
 
 // Состояние модального окна
 const isModalOpen = ref(false);
@@ -138,11 +196,12 @@ const availableTeams = computed(() => {
   return teams;
 });
 
-// Открытие и закрытие модального окна
+// Открытие модального окна
 const openAddEmployeeModal = () => {
   isModalOpen.value = true;
 };
 
+// Закрытие модального окна
 const closeModal = () => {
   isModalOpen.value = false;
   resetForm();
@@ -172,8 +231,6 @@ watch(
 
 // Отправка данных на бэкенд
 const addEmployee = async () => {
-  try {
-    // Шаг 1: Создаем сотрудника через POST
     const createResponse = await axios.post('http://127.0.0.1:8000/api/employees/', {
       full_name: newEmployee.value.full_name,
       position: newEmployee.value.position,
@@ -196,13 +253,47 @@ const addEmployee = async () => {
 
     // Обновить список сотрудников
     emit('refresh-employees');
-  } catch (error) {
-    console.error('Ошибка при добавлении сотрудника:', error);
-  }
 };
 
 // Проверка возможности добавления сотрудника
 const canAddEmployee = computed(() => {
   return availableTeams.value.length > 0;
 });
+
+const handleDeleteEmployee = (employeeId) => {
+  // Удаляем сотрудника из локального массива
+  localEmployees.value = localEmployees.value.filter(emp => emp.id !== employeeId);
+};
+
+const handleEditEmployee = (employee) => {
+  // Открываем модальное окно для редактирования
+  openEditEmployeeModal(employee);
+};
+
+const isEditModalOpen = ref(false);
+const editedEmployee = ref(null);
+
+const openEditEmployeeModal = (employee) => {
+  editedEmployee.value = { ...employee }; // Создаем копию сотрудника
+  isEditModalOpen.value = true;
+};
+
+const closeEditModal = () => {
+  isEditModalOpen.value = false;
+  editedEmployee.value = null;
+};
+
+const saveEditedEmployee = async () => {
+  try {
+    await axios.put(`http://127.0.0.1:8000/api/employees/${editedEmployee.value.id}/`, editedEmployee.value);
+    // Обновляем локальный массив
+    const index = localEmployees.value.findIndex(emp => emp.id === editedEmployee.value.id);
+    if (index !== -1) {
+      localEmployees.value[index] = { ...editedEmployee.value };
+    }
+    closeEditModal();
+  } catch (error) {
+    console.error('Ошибка при редактировании сотрудника:', error.response?.data);
+  }
+};
 </script>

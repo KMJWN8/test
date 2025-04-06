@@ -31,12 +31,8 @@
   </div>
 </template>
 
-<style>
-
-</style>
-
-
 <script setup>
+
 defineProps({
   statistics: {
     type: Object,
@@ -44,6 +40,8 @@ defineProps({
   },
 });
 
+/* Функция, которая позволяет учитывать особенности русского языка 
+при использовании слов "год" и "лет"*/
 function getPlural(number, words) {
   const cases = [2, 0, 1, 1, 1, 2];
   return words[
@@ -53,5 +51,3 @@ function getPlural(number, words) {
   ];
 }
 </script>
-
-<style></style>
