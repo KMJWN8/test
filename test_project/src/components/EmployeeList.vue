@@ -3,7 +3,7 @@
     <div class="flex justify-between items-center mb-4">
       <h3 v-if="localEmployees.length" class="text-xl font-bold text-gray-800">Список сотрудников</h3>
       <button
-        v-if="canAddEmployee"
+
         @click="openAddEmployeeModal"
         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
       >
@@ -27,7 +27,7 @@
     </div>
 
     <!-- Модальное окно для добавления сотрудника -->
-    <div v-if="isModalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div v-if="isModalOpen" class="fixed inset-0 bg-opacity-50 flex items-center justify-center">
       <div class="bg-white p-6 rounded-lg shadow-lg w-[400px]">
         <h2 class="text-xl font-bold mb-4">Добавить сотрудника</h2>
         <form @submit.prevent="addEmployee">
@@ -93,8 +93,9 @@
         </form>
       </div>
     </div>
-  </div>
-  <div v-if="isEditModalOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+ 
+
+  <div v-if="isEditModalOpen" class="fixed inset-0 bg-opacity-50 flex items-center justify-center">
   <div class="bg-white p-6 rounded-lg shadow-lg w-[400px]">
     <h2 class="text-xl font-bold mb-4">Редактировать сотрудника</h2>
     <form @submit.prevent="saveEditedEmployee">
@@ -148,10 +149,11 @@
     </form>
   </div>
 </div>
+</div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch} from 'vue';
 import axios from 'axios';
 import EmployeeCard from './EmployeeCard.vue';
 
@@ -180,7 +182,7 @@ const newEmployee = ref({
 
 // Вычисляем доступные группы для выбора
 const availableTeams = computed(() => {
-  if (!props.selectedNode || !props.selectedNode.children) return [];
+  if (!props.selectedNode) return [];
 
   const teams = [];
   function collectTeams(node) {
@@ -229,7 +231,6 @@ watch(
   }
 );
 
-// Отправка данных на бэкенд
 const addEmployee = async () => {
     const createResponse = await axios.post('http://127.0.0.1:8000/api/employees/', {
       full_name: newEmployee.value.full_name,
@@ -255,14 +256,10 @@ const addEmployee = async () => {
     emit('refresh-employees');
 };
 
-// Проверка возможности добавления сотрудника
-const canAddEmployee = computed(() => {
-  return availableTeams.value.length > 0;
-});
-
 const handleDeleteEmployee = (employeeId) => {
   // Удаляем сотрудника из локального массива
   localEmployees.value = localEmployees.value.filter(emp => emp.id !== employeeId);
+  emit('refresh-employees')
 };
 
 const handleEditEmployee = (employee) => {

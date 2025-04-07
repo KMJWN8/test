@@ -17,7 +17,7 @@
             <EmployeeList 
             :employees="selectedEmployees"
             :selected-node="selectedNode"
-            @refresh-employees="onNodeSelected(selectedNode)" />
+            @refresh-employees="fetchData" />
           </div>
         </el-main>
       </el-container>

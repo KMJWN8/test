@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-4 p-4 bg-white border border-slate-100 rounded-lg shadow-md cursor-pointer hover:-translate-y-2 hover:shadow-xl transition">
+  <div class="flex gap-4 p-4 bg-white border border-slate-100 rounded-lg shadow-2xs hover:-translate-y-1 hover:shadow-md transition">
     <div class="flex-shrink-0 w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
       <img
         v-if="employee.photo"
@@ -17,19 +17,20 @@
     </div>
     <div class="flex flex-col gap-2">
       <!-- Кнопка редактирования -->
-      <button
+      <img
         @click="editEmployee"
-        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Редактировать
-      </button>
+        src="@/assets/icons/edit_icon.png"
+        alt="Редактировать"
+        class="cursor-pointer hover:opacity-75 transition-opacity rounded-md w-5 h-5"
+      />
       <!-- Кнопка удаления -->
-      <button
+      <img
         @click="deleteEmployee"
-        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Удалить
-      </button>
+        src="@/assets/icons/delete_icon.png"
+        alt="Удалить"
+        class="cursor-pointer hover:opacity-75 transition-opacity rounded-md w-5 h-5"
+      />
+
     </div>
   </div>
 </template>
