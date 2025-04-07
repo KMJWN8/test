@@ -19,6 +19,7 @@
   class="fixed bg-white border border-gray-300 rounded-lg shadow-lg py-2 w-70 z-50"
   :style="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }">
     <div 
+    v-if="selectedNode?.type !== 'team'"
       class="px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition"
       @click="openForm('add')">
       ➕ Добавить дочерний узел
@@ -83,12 +84,8 @@ const handleNodeExpand = (node) => {
 }
 
 const handleRightClick = (event, node) => {
-  let choice = true
   selectedNode.value = node
-  if (selectedNode.value.type === 'team'){
-    choice = false
-  }
-  contextMenu.value = { visible: choice, x: event.clientX, y: event.clientY }
+  contextMenu.value = { visible: true, x: event.clientX, y: event.clientY }
 }
 
 const openForm = (mode) => {
