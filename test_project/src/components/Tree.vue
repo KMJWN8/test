@@ -8,33 +8,33 @@
       :data="treeData"
       node-key="id"
       :default-expanded-keys="expandedKeys"
-      @node-click="handleNodeClick"
-      @node-expand="handleNodeExpand"
-      @node-contextmenu="handleRightClick"
+      @node-click="nodeClick"
+      @node-expand="nodeExpand"
+      @node-contextmenu="rightClick"
     />
 
     <!-- Контекстное меню -->
-<div 
-  v-if="contextMenu.visible" 
-  class="fixed bg-white border border-gray-300 rounded-lg shadow-lg py-2 w-70 z-50"
-  :style="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }">
-    <div 
-    v-if="selectedNode?.type !== 'team'"
-      class="px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition"
-      @click="openForm('add')">
-      ➕ Добавить дочерний узел
-    </div>
-    <div 
-      class="px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition"
-      @click="openForm('edit')">
-      ✏️ Редактировать узел
-    </div>
-    <div 
-      class="px-4 py-2 text-red-600 hover:bg-red-100 hover:text-red-800 cursor-pointer transition"
-      @click="deleteNode">
-      🗑️ Удалить узел
-    </div>
-</div>
+  <div 
+    v-if="contextMenu.visible" 
+    class="fixed bg-white border border-gray-300 rounded-lg shadow-lg py-2 w-70 z-50"
+    :style="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }">
+      <div 
+      v-if="selectedNode?.type !== 'team'"
+        class="px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition"
+        @click="openForm('add')">
+        ➕ Добавить дочерний узел
+      </div>
+      <div 
+        class="px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer transition"
+        @click="openForm('edit')">
+        ✏️ Редактировать узел
+      </div>
+      <div 
+        class="px-4 py-2 text-red-600 hover:bg-red-100 hover:text-red-800 cursor-pointer transition"
+        @click="deleteNode">
+        🗑️ Удалить узел
+      </div>
+  </div>
 
     <!-- Модальное окно с формой -->
     <el-dialog
@@ -75,15 +75,15 @@ const formTitle = ref('')
 const formMode = ref('') // 'add' или 'edit'
 const form = ref({name: '',})
 
-const handleNodeClick = (node) => {
+const nodeClick = (node) => {
   emit('node-selected', node)
 }
 
-const handleNodeExpand = (node) => {
+const nodeExpand = (node) => {
   expandedKeys.value.push(node.id)
 }
 
-const handleRightClick = (event, node) => {
+const rightClick = (event, node) => {
   selectedNode.value = node
   contextMenu.value = { visible: true, x: event.clientX, y: event.clientY }
 }
@@ -97,30 +97,31 @@ const openForm = (mode) => {
 };
 
 const submitForm = async () => {
-if (formMode.value === 'add') {
-  let parentKey = ''
-  let childKey = ''
-  switch (selectedNode.value.type) {
-    case 'service':
-      parentKey = 'service'
-      childKey = 'department'
-      break;
-    case 'department':
-      parentKey = 'department'
-      childKey = 'division'
-      break;
-    case 'division':
-      parentKey = 'division'
-      childKey = 'team'
-      break;
-    default:
-      console.log('Неизвестный тип узла')
-      return;
-  }
+  if (formMode.value === 'add') {
+    let parentKey = ''
+    let childKey = ''
+    switch (selectedNode.value.type) {
+      case 'service':
+        parentKey = 'service'
+        childKey = 'department'
+        break;
+      case 'department':
+        parentKey = 'department'
+        childKey = 'division'
+        break;
+      case 'division':
+        parentKey = 'division'
+        childKey = 'team'
+        break;
+      default:
+        console.log('Неизвестный тип узла')
+        return;
+    }
 
-const url = `http://127.0.0.1:8000/api/${childKey}s/`
-  await axios.post(url, { name: form.value.name, [parentKey]: selectedNode.value.id })
-} else if (formMode.value === 'edit') {
+    const url = `http://127.0.0.1:8000/api/${childKey}s/`
+    await axios.post(url, { name: form.value.name, [parentKey]: selectedNode.value.id })
+  } 
+  else if (formMode.value === 'edit') {
     const url = `http://127.0.0.1:8000/api/${selectedNode.value.type}s/${selectedNode.value.id}/`
     await axios.patch(url, { name: form.value.name })
   }
@@ -135,11 +136,11 @@ const url = `http://127.0.0.1:8000/api/${childKey}s/`
     await axios.delete(url)
     emit('refresh-tree', expandedKeys.value)
     contextMenu.value.visible = false
-  };
+  }
   
   const resetForm = () => {
     form.value.name = ''
-  };
+  }
   
   onMounted(() => {
     document.addEventListener('click', () => {
@@ -148,20 +149,20 @@ const url = `http://127.0.0.1:8000/api/${childKey}s/`
   })
 
 </script>
-  <style>
-    .el-tree-node__content{
+<style>
+  .el-tree-node__content{
       color: black !important;
-    }
+  }
 
-    .el-tree-node__expand-icon {
+  .el-tree-node__expand-icon {
     color: black !important;
-    }
+  }
 
-    .el-tree {
+  .el-tree {
     --el-tree-node-hover-bg-color: #00ABE1 !important;
-    }
+  }
 
-    .el-button--primary {
+  .el-button--primary {
     --el-button-bg-color: #161F6D !important; 
-    }
-  </style>
+  }
+</style>

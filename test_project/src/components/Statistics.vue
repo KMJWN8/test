@@ -38,16 +38,16 @@ defineProps({
     type: Object,
     default: null,
   },
-});
+})
 
 /* Функция, которая позволяет учитывать особенности русского языка 
 при использовании слов "год" и "лет"*/
 function getPlural(number, words) {
-  const cases = [2, 0, 1, 1, 1, 2];
+  const cases = [2, 0, 1, 1, 1, 2]
   return words[
     (number % 100 > 4 && number % 100 < 20) 
       ? 2 
       : cases[Math.min(number % 10, 5)]
-  ];
+  ]
 }
 </script>

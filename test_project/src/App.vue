@@ -9,7 +9,11 @@
       </el-header>
       <el-container class="flex-1">
         <el-aside class="shadow-md">
-          <Tree :tree-data="treeData" @node-selected="onNodeSelected" @refresh-tree="fetchData"/>
+          <Tree 
+          :tree-data="treeData" 
+          @node-selected="onNodeSelected" 
+          @refresh-tree="fetchData"
+          />
         </el-aside>
         <el-main>
           <Statistics :statistics="currentStatistics" />
@@ -17,7 +21,8 @@
             <EmployeeList 
             :employees="selectedEmployees"
             :selected-node="selectedNode"
-            @refresh-employees="fetchData" />
+            @refresh-employees="fetchData" 
+            />
           </div>
         </el-main>
       </el-container>
@@ -26,128 +31,124 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import axios from 'axios';
-import Tree from './components/Tree.vue';
-import EmployeeList from './components/EmployeeList.vue';
-import Statistics from './components/Statistics.vue';
+import { ref } from 'vue'
+import axios from 'axios'
+
+import Tree from './components/Tree.vue'
+import EmployeeList from './components/EmployeeList.vue'
+import Statistics from './components/Statistics.vue'
 
 // Инициализация данных
-const treeData = ref([]);
-const selectedEmployees = ref([]);
-const currentStatistics = ref(null);
+const treeData = ref([])
+const selectedEmployees = ref([])
+const currentStatistics = ref(null)
 
 const transformData = (apiData) => {
   return apiData.map((service) => ({
     id: service.id,
     label: service.name,
-    type: 'service', // Указываем тип узла
+    type: 'service',
     children: service.departments.map((department) => ({
       id: department.id,
       label: department.name,
-      type: 'department', // Указываем тип узла
+      type: 'department',
       children: department.divisions.map((division) => ({
         id: division.id,
         label: division.name,
-        type: 'division', // Указываем тип узла
+        type: 'division',
         children: division.teams.map((team) => ({
           id: team.id,
           label: team.name,
-          type: 'team', // Указываем тип узла
+          type: 'team',
           members: team.members,
         })),
       })),
     })),
-  }));
-};
+  }))
+}
 
 const fetchData = async (expandedKeys = []) => {
-  try {
-    const response = await axios.get('http://127.0.0.1:8000/api/services/');
-    treeData.value = transformData(response.data);
-    expandedKeys.forEach(key => expandedKeys.value.push(key));
-  } catch (error) {
-    console.error('Ошибка при получении данных:', error);
-  }
-};
+  const response = await axios.get('http://127.0.0.1:8000/api/services/')
+  treeData.value = transformData(response.data)
+  expandedKeys.forEach(key => expandedKeys.value.push(key))
+}
 
 const selectedNode = ref(null);
 
 const onNodeSelected = async (node) => {
-  selectedNode.value = node; // Сохраняем выбранный узел
-  selectedEmployees.value = collectEmployees(node);
+  selectedNode.value = node // Сохраняем выбранный узел
+  selectedEmployees.value = collectEmployees(node)
 
   try {
-    let url = '';
+    let url = ''
 
     // Формируем URL в зависимости от типа узла
     switch (node.type) {
       case 'service':
-        url = `http://127.0.0.1:8000/api/services/${node.id}/statistics/`;
-        break;
+        url = `http://127.0.0.1:8000/api/services/${node.id}/statistics/`
+        break
       case 'department':
-        url = `http://127.0.0.1:8000/api/departments/${node.id}/statistics/`;
-        break;
+        url = `http://127.0.0.1:8000/api/departments/${node.id}/statistics/`
+        break
       case 'division':
-        url = `http://127.0.0.1:8000/api/divisions/${node.id}/statistics/`;
-        break;
+        url = `http://127.0.0.1:8000/api/divisions/${node.id}/statistics/`
+        break
       case 'team':
-        url = `http://127.0.0.1:8000/api/teams/${node.id}/statistics/`;
-        break;
+        url = `http://127.0.0.1:8000/api/teams/${node.id}/statistics/`
+        break
       default:
-        console.error('Неизвестный тип узла:', node.type);
-        return;
+        console.error('Неизвестный тип узла:', node.type)
+        return
     }
 
-    const response = await axios.get(url);
-    currentStatistics.value = response.data;
+    const response = await axios.get(url)
+    currentStatistics.value = response.data
   } catch (error) {
-    console.error('Ошибка при получении статистики:', error);
-    currentStatistics.value = null;
+    console.error('Ошибка при получении статистики:', error)
+    currentStatistics.value = null
   }
-};
+}
 
 
 // Рекурсивный сбор сотрудников
 const collectEmployees = (node) => {
-    const employees = [];
-    const seenIds = new Set();
+    const employees = []
+    const seenIds = new Set()
 
     function recurse(currentNode) {
         if (currentNode.leader) {
             if (!seenIds.has(currentNode.leader.id)) {
-                employees.push(currentNode.leader);
-                seenIds.add(currentNode.leader.id);
+                employees.push(currentNode.leader)
+                seenIds.add(currentNode.leader.id)
             }
         }
 
         if (currentNode.members) {
             currentNode.members.forEach(member => {
                 if (!seenIds.has(member.id)) {
-                    employees.push(member);
-                    seenIds.add(member.id);
+                    employees.push(member)
+                    seenIds.add(member.id)
                 }
-            });
+            })
         }
 
         if (currentNode.children) {
-            currentNode.children.forEach(child => recurse(child));
+            currentNode.children.forEach(child => recurse(child))
         }
     }
 
-    recurse(node);
-    return employees;
-};
+    recurse(node)
+    return employees
+}
 
 // Вызов функции загрузки данных при инициализации
-fetchData();
+fetchData()
 </script>
 
 <style>
 .el-aside{
   width: fit-content !important;
   transition: width 0.3s ease-in-out !important;
-  
 }
 .scrollable-content {
   overflow-y: auto; /* Добавляем прокрутку по вертикали */

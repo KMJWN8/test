@@ -17,8 +17,8 @@
         v-for="employee in localEmployees"
         :key="employee.id"
         :employee="employee"
-        @delete-employee="handleDeleteEmployee"
-        @edit-employee="handleEditEmployee"
+        @delete-employee="deleteEmployee"
+        @edit-employee="editEmployee"
       />
     </div>
 
@@ -94,7 +94,7 @@
       </div>
     </div>
  
-
+    <!-- Модальное окно для редактирования сотрудника -->
   <div v-if="isEditModalOpen" class="fixed inset-0 bg-opacity-50 flex items-center justify-center">
   <div class="bg-white p-6 rounded-lg shadow-lg w-[400px]">
     <h2 class="text-xl font-bold mb-4">Редактировать сотрудника</h2>
@@ -153,9 +153,9 @@
 </template>
 
 <script setup>
-import { ref, computed, watch} from 'vue';
-import axios from 'axios';
-import EmployeeCard from './EmployeeCard.vue';
+import { ref, computed, watch} from 'vue'
+import axios from 'axios'
+import EmployeeCard from './EmployeeCard.vue'
 
 const props = defineProps({
   employees: {
@@ -166,50 +166,47 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-});
+})
 
-const emit = defineEmits(['refresh-employees', 'delete-employee']);
+const emit = defineEmits(['refresh-employees', 'delete-employee'])
 
-// Состояние модального окна
-const isModalOpen = ref(false);
+const isModalOpen = ref(false)
+
 const newEmployee = ref({
   full_name: '',
   position: '',
   date_of_birth: '',
   start_date: '',
   team: null,
-});
+})
 
 // Вычисляем доступные группы для выбора
 const availableTeams = computed(() => {
-  if (!props.selectedNode) return [];
+  if (!props.selectedNode) return []
 
-  const teams = [];
+  const teams = []
   function collectTeams(node) {
     if (node.type === 'team') {
-      teams.push({ id: node.id, name: node.label });
+      teams.push({ id: node.id, name: node.label })
     }
     if (node.children) {
-      node.children.forEach(child => collectTeams(child));
+      node.children.forEach(child => collectTeams(child))
     }
   }
 
-  collectTeams(props.selectedNode);
-  return teams;
-});
+  collectTeams(props.selectedNode)
+  return teams
+})
 
-// Открытие модального окна
 const openAddEmployeeModal = () => {
-  isModalOpen.value = true;
-};
+  isModalOpen.value = true
+}
 
-// Закрытие модального окна
 const closeModal = () => {
-  isModalOpen.value = false;
-  resetForm();
-};
+  isModalOpen.value = false
+  resetForm()
+}
 
-// Сброс формы
 const resetForm = () => {
   newEmployee.value = {
     full_name: '',
@@ -217,19 +214,19 @@ const resetForm = () => {
     date_of_birth: '',
     start_date: '',
     team: null,
-  };
-};
+  }
+}
 
 // Создаем локальную копию массива
-const localEmployees = ref([...props.employees]);
+const localEmployees = ref([...props.employees])
 
 // Наблюдаем за изменениями props.employees
 watch(
   () => props.employees,
   (newEmployees) => {
-    localEmployees.value = [...newEmployees];
+    localEmployees.value = [...newEmployees]
   }
-);
+)
 
 const addEmployee = async () => {
     const createResponse = await axios.post('http://127.0.0.1:8000/api/employees/', {
@@ -237,60 +234,55 @@ const addEmployee = async () => {
       position: newEmployee.value.position,
       date_of_birth: newEmployee.value.date_of_birth,
       start_date: newEmployee.value.start_date,
-    });
+    })
 
-    const employeeId = createResponse.data.id; // Получаем ID созданного сотрудника
+    const employeeId = createResponse.data.id // Получаем ID созданного сотрудника
 
     // Шаг 2: Добавляем сотрудника в выбранную группу через PATCH
-    const teamId = newEmployee.value.team;
+    const teamId = newEmployee.value.team
     await axios.patch(`http://127.0.0.1:8000/api/teams/${teamId}/add-member/`, {
       member_id: employeeId,
-    });
+    })
     // Добавляем сотрудника в локальный список
-    localEmployees.value.push(createResponse.data);
+    localEmployees.value.push(createResponse.data)
 
     // Закрыть модальное окно и очистить форму
-    closeModal();
+    closeModal()
 
     // Обновить список сотрудников
-    emit('refresh-employees');
-};
+    emit('refresh-employees')
+}
 
-const handleDeleteEmployee = (employeeId) => {
+const deleteEmployee = (employeeId) => {
   // Удаляем сотрудника из локального массива
-  localEmployees.value = localEmployees.value.filter(emp => emp.id !== employeeId);
+  localEmployees.value = localEmployees.value.filter(emp => emp.id !== employeeId)
   emit('refresh-employees')
-};
+}
 
-const handleEditEmployee = (employee) => {
-  // Открываем модальное окно для редактирования
-  openEditEmployeeModal(employee);
-};
+const isEditModalOpen = ref(false)
+const editedEmployee = ref(null)
 
-const isEditModalOpen = ref(false);
-const editedEmployee = ref(null);
-
-const openEditEmployeeModal = (employee) => {
-  editedEmployee.value = { ...employee }; // Создаем копию сотрудника
-  isEditModalOpen.value = true;
-};
+const editEmployee = (employee) => {
+  editedEmployee.value = { ...employee } // Создаем копию сотрудника
+  isEditModalOpen.value = true
+}
 
 const closeEditModal = () => {
-  isEditModalOpen.value = false;
-  editedEmployee.value = null;
-};
+  isEditModalOpen.value = false
+  editedEmployee.value = null
+}
 
 const saveEditedEmployee = async () => {
   try {
-    await axios.put(`http://127.0.0.1:8000/api/employees/${editedEmployee.value.id}/`, editedEmployee.value);
+    await axios.put(`http://127.0.0.1:8000/api/employees/${editedEmployee.value.id}/`, editedEmployee.value, photo = null)
     // Обновляем локальный массив
-    const index = localEmployees.value.findIndex(emp => emp.id === editedEmployee.value.id);
+    const index = localEmployees.value.findIndex(emp => emp.id === editedEmployee.value.id)
     if (index !== -1) {
-      localEmployees.value[index] = { ...editedEmployee.value };
+      localEmployees.value[index] = { ...editedEmployee.value }
     }
-    closeEditModal();
+    closeEditModal()
   } catch (error) {
-    console.error('Ошибка при редактировании сотрудника:', error.response?.data);
+    console.error('Ошибка при редактировании сотрудника:', error.response?.data)
   }
-};
+}
 </script>

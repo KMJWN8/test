@@ -36,37 +36,37 @@
 </template>
 
 <script setup>
-import axios from 'axios';
+import axios from 'axios'
 
 const props = defineProps({
   employee: {
     type: Object,
     required: true,
   },
-});
+})
 
-const emit = defineEmits(['delete-employee', 'edit-employee']);
+const emit = defineEmits(['delete-employee', 'edit-employee'])
 
 const formatDate = (dateString) => {
-  const date = new Date(dateString);
+  const date = new Date(dateString)
   return date.toLocaleDateString('ru-RU', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  });
-};
+  })
+}
 
 const getPhotoUrl = (photoPath) => {
-  if (!photoPath) return null;
-  return photoPath.startsWith('http') ? photoPath : `http://127.0.0.1:8000${photoPath}`;
-};
+  if (!photoPath) return null
+  return photoPath.startsWith('http') ? photoPath : `http://127.0.0.1:8000${photoPath}`
+}
 
 const deleteEmployee = async () => {
-  await axios.delete(`http://127.0.0.1:8000/api/employees/${props.employee.id}/`);
-  emit('delete-employee', props.employee.id); // Уведомляем родителя об удалении
-};
+  await axios.delete(`http://127.0.0.1:8000/api/employees/${props.employee.id}/`)
+  emit('delete-employee', props.employee.id) // Уведомляем родителя об удалении
+}
 
 const editEmployee = () => {
-  emit('edit-employee', props.employee); // Уведомляем родителя о редактировании
-};
+  emit('edit-employee', props.employee) // Уведомляем родителя о редактировании
+}
 </script>
