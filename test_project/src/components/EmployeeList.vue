@@ -50,6 +50,15 @@
             />
           </div>
           <div class="mb-4">
+            <label class="block text-gray-700">Фото сотрудника</label>
+            <input
+              type="file"
+              @change="photoUpload"
+              class="w-full border border-gray-300 rounded px-3 py-2"
+              required
+            />
+          </div>
+          <div class="mb-4">
             <label class="block text-gray-700">Дата рождения</label>
             <input
               v-model="newEmployee.date_of_birth"
@@ -178,7 +187,13 @@ const newEmployee = ref({
   date_of_birth: '',
   start_date: '',
   team: null,
+  photo: null,
 })
+
+const photoUpload = (event) => {
+  const file = event.target.files[0]
+  newEmployee.value.photo = file
+}
 
 // Вычисляем доступные группы для выбора
 const availableTeams = computed(() => {
@@ -214,6 +229,7 @@ const resetForm = () => {
     date_of_birth: '',
     start_date: '',
     team: null,
+    photo: null,
   }
 }
 
@@ -229,28 +245,40 @@ watch(
 )
 
 const addEmployee = async () => {
-    const createResponse = await axios.post('http://127.0.0.1:8000/api/employees/', {
-      full_name: newEmployee.value.full_name,
-      position: newEmployee.value.position,
-      date_of_birth: newEmployee.value.date_of_birth,
-      start_date: newEmployee.value.start_date,
-    })
+  const formData = new FormData();
+  formData.append('full_name', newEmployee.value.full_name);
+  formData.append('position', newEmployee.value.position);
+  formData.append('date_of_birth', newEmployee.value.date_of_birth);
+  formData.append('start_date', newEmployee.value.start_date);
+  formData.append('team', newEmployee.value.team);
 
-    const employeeId = createResponse.data.id // Получаем ID созданного сотрудника
+  if (newEmployee.value.photo) {
+    formData.append('photo', newEmployee.value.photo); // Добавляем файл в FormData
+  }
 
-    // Шаг 2: Добавляем сотрудника в выбранную группу через PATCH
-    const teamId = newEmployee.value.team
-    await axios.patch(`http://127.0.0.1:8000/api/teams/${teamId}/add-member/`, {
-      member_id: employeeId,
-    })
-    // Добавляем сотрудника в локальный список
-    localEmployees.value.push(createResponse.data)
+  const response = await axios.post('http://127.0.0.1:8000/api/employees/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
 
-    // Закрыть модальное окно и очистить форму
-    closeModal()
+  console.log('Сотрудник добавлен:', response.data);
 
-    // Обновить список сотрудников
-    emit('refresh-employees')
+  const employeeId = response.data.id // Получаем ID созданного сотрудника
+
+  // Шаг 2: Добавляем сотрудника в выбранную группу через PATCH
+  const teamId = newEmployee.value.team
+  await axios.patch(`http://127.0.0.1:8000/api/teams/${teamId}/add-member/`, {
+    member_id: employeeId,
+  })
+  // Добавляем сотрудника в локальный список
+  localEmployees.value.push(response.data)
+
+  // Закрыть модальное окно и очистить форму
+  closeModal()
+
+  // Обновить список сотрудников
+  emit('refresh-employees')
 }
 
 const deleteEmployee = (employeeId) => {
