@@ -6,6 +6,12 @@
         <div class="my-3 mx-8 text-2xl font-bold text-amber-50">
             ГИС учета сотрудников
         </div>
+        <div class="relative flex items-center">
+          <input
+          class="bg-white my-4 ml-150 rounded-md pr-2 pl-2 "
+          placeholder="Поиск"
+          type="text">
+        </div>
       </el-header>
       <el-container class="flex-1">
         <el-aside class="shadow-md">
